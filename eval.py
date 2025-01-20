@@ -2,6 +2,7 @@ import subprocess
 import argparse
 import re
 import sys
+import os
 
 def test_hoon_code(hoon_code: str, input_str: str, expected: str) -> bool:
     """
@@ -52,23 +53,110 @@ def test_hoon_code(hoon_code: str, input_str: str, expected: str) -> bool:
         print(f"An error occurred: {e}")
         return False
 
+def run_filesystem_tests(test_dir: str):
+    """
+    Run tests from a directory structure of .in and .out files.
+    
+    Directory structure expected:
+    test_dir/
+        problem_name/
+            1.in
+            1.out
+            2.in
+            2.out
+            ...
+    """
+    problems = {}
+    for root, dirs, files in os.walk(test_dir):
+        if not files:
+            continue
+            
+        problem = os.path.relpath(root, test_dir)
+        if problem not in problems:
+            problems[problem] = {"inputs": [], "outputs": []}
+            
+        for f in sorted(files):
+            if f.endswith('.in'):
+                problems[problem]["inputs"].append(os.path.join(root, f))
+            elif f.endswith('.out'):
+                problems[problem]["outputs"].append(os.path.join(root, f))
+                
+    total_tests = 0
+    failed_tests = []
+    
+    for problem, tests in problems.items():
+        print(f"\nRunning tests for problem: {problem}")
+        inputs = sorted(tests["inputs"])
+        outputs = sorted(tests["outputs"])
+        
+        if len(inputs) != len(outputs):
+            print(f"Warning: Mismatched number of input/output files for {problem}")
+            continue
+            
+        for input_file, output_file in zip(inputs, outputs):
+            test_num = os.path.splitext(os.path.basename(input_file))[0]
+            print(f"\nTest {test_num}:")
+            
+            with open(input_file, 'r') as f:
+                input_data = f.read().strip()
+            with open(output_file, 'r') as f:
+                expected = f.read().strip()
+                
+            # TODO: Extract hoon_code based on problem name/configuration
+            hoon_code = "add"  # Placeholder
+            
+            result = test_hoon_code(hoon_code, input_data, expected)
+            if not result:
+                failed_tests.append((problem, test_num))
+            total_tests += 1
+            print("Pass" if result else "Fail")
+    
+    print(f"\nTest Summary:")
+    print(f"Ran {total_tests} tests across {len(problems)} problems")
+    if failed_tests:
+        print(f"Failed {len(failed_tests)} tests:")
+        for problem, test_num in failed_tests:
+            print(f"  Problem {problem}, Test {test_num}")
+    else:
+        print("All tests passed!")
+    
+    return len(failed_tests)
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Test a Hoon function using `urbit eval`.")
-    parser.add_argument("--test", action="store_true", help="Run the test suite")
-    parser.add_argument("hoon_code", nargs="?", type=str, help="The Hoon code containing the function.")
-    parser.add_argument("input_str", nargs="?", type=str, help="The input to provide to the Hoon function.")
-    parser.add_argument("expected_output", nargs="?", type=str, help="The expected output from the Hoon function.")
+    
+    # Add subparsers for different modes
+    subparsers = parser.add_subparsers(dest='mode', help='Mode of operation')
+    
+    # Filesystem test mode
+    fs_parser = subparsers.add_parser('fs', help='Run tests from filesystem')
+    fs_parser.add_argument('test_dir', type=str, help='Directory containing test files')
+    
+    # Direct test mode
+    direct_parser = subparsers.add_parser('direct', help='Run a single test directly')
+    direct_parser.add_argument("hoon_code", type=str, help="The Hoon code containing the function.")
+    direct_parser.add_argument("input_str", type=str, help="The input to provide to the Hoon function.")
+    direct_parser.add_argument("expected_output", type=str, help="The expected output from the Hoon function.")
+    
+    # Built-in test suite mode
+    test_parser = subparsers.add_parser('test', help='Run built-in test suite')
 
     args = parser.parse_args()
     
-    # Validate arguments
-    if not args.test and (args.hoon_code is None or args.input_str is None or args.expected_output is None):
-        parser.error("Must provide hoon_code, input_str, and expected_output unless running tests")
+    if args.mode == 'fs':
+        # Run tests from filesystem
+        exit_code = run_filesystem_tests(args.test_dir)
+        sys.exit(exit_code)
         
-    print(args)
-
-    # Check if we're running tests
-    if args.test:
+    elif args.mode == 'direct':
+        # Run a single direct test
+        result = test_hoon_code(args.hoon_code, args.input_str, args.expected_output)
+        print(result)
+        print("Pass" if result else "Fail")
+        sys.exit(0 if result else 1)
+        
+    elif args.mode == 'test':
+        # Run built-in test suite
         test_cases = [
             # (hoon_code, input_str, expected_output)
             ("add", "5 5", "10"),
@@ -97,7 +185,7 @@ if __name__ == "__main__":
             print("All tests passed!")
         
         sys.exit(len(failed_tests))
+    
     else:
-        result = test_hoon_code(args.hoon_code, args.input_str, args.expected_output)
-        print(result)
-        print("Pass" if result else "Fail")
+        parser.print_help()
+        sys.exit(1)
