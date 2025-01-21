@@ -1,0 +1,1 @@
+You are an expert Hoon programmer. Read the following problem, and produce a Hoon gate that compiles successfully, meets the specification, and outputs the correct result. Provide the entire code, without any explanations or clarifications.
