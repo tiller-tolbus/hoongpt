@@ -2,19 +2,19 @@
     "question": "Write a gate that takes a string (`tape`) and returns the total count of vowels (`a, e, i, o, u`) in that string as an atom (`@ud`). Assume only lowercase letters.",
     "tests": [
         {
-            "input": "rhythm",
+            "input": "\"rhythm\"",
             "expected": "0"
         },
         {
-            "input": "arithmetic",
+            "input": "\"arithmetic\"",
             "expected": "4"
         },
         {
-            "input": "aeiou",
+            "input": "\"aeiou\"",
             "expected": "5"
         },
         {
-            "input": "programming",
+            "input": "\"programming\"",
             "expected": "3"
         }
     ]

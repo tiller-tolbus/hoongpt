@@ -2,20 +2,20 @@
     "question": "Write a gate that takes a string (`tape`) and returns a new string where each letter is shifted by 1 position in the alphabet (e.g., `a -> b`, `b -> c`, ..., `z -> a`). For simplicity, assume the string has only lowercase letters `a` to `z`.",
     "tests": [
         {
-            "input": "mars",
-            "expected": "nbst"
+            "input": "\"mars\"",
+            "expected": "\"nbst\""
         },
         {
-            "input": "urbit",
-            "expected": "vscju"
+            "input": "\"urbit\"",
+            "expected": "\"vscju\""
         },
         {
-            "input": "galaxy",
-            "expected": "hbmbyz"
+            "input": "\"galaxy\"",
+            "expected": "\"hbmbyz\""
         },
         {
-            "input": "zephyr",
-            "expected": "afqizs"
+            "input": "\"zephyr\"",
+            "expected": "\"afqizs\""
         }
     ]
 }

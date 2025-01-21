@@ -5,6 +5,8 @@ use serde::{Deserialize, Serialize};
 use reqwest;
 use regex::Regex;
 use dotenv::dotenv;
+use std::collections::HashMap;
+
 #[derive(Debug, Serialize, Deserialize)]
 struct TestCase {
     input: String,
@@ -33,7 +35,7 @@ async fn query_ai_model(system_prompt: &str, user_prompt: &str) -> Result<String
     let client = reqwest::Client::new();
 
     let payload = serde_json::json!({
-        "model": "gpt-4o",
+        "model": "gpt-4-turbo",
         "messages": [
             {
                 "role": "system",
@@ -47,7 +49,6 @@ async fn query_ai_model(system_prompt: &str, user_prompt: &str) -> Result<String
     });
     let auth_token = std::env::var("OPENAI_API_KEY")
         .map_err(|_| "OPENAI_API_KEY environment variable not set")?;
-
     let response = client.post("https://api.openai.com/v1/chat/completions")
         .header("Authorization", format!("Bearer {}", auth_token))
         .header("Content-Type", "application/json")
@@ -55,9 +56,14 @@ async fn query_ai_model(system_prompt: &str, user_prompt: &str) -> Result<String
         .send()
         .await?;
 
+    if !response.status().is_success() {
+        let error_text = response.text().await?;
+        println!("error response: {}", error_text);
+        return Err(error_text.into());
+    }
+
     let result: serde_json::Value = response.json().await?;
 
-    
     Ok(result["choices"][0]["message"]["content"]
         .as_str()
         .unwrap_or("")
@@ -66,12 +72,12 @@ async fn query_ai_model(system_prompt: &str, user_prompt: &str) -> Result<String
 #[derive(Debug)]
 enum TestError {
     CommandError(String),
-    SyntaxError,
-    CompileError,
+    SyntaxError(String),
+    CompileError(String),
     UnexpectedOutput(String),
 }
 
-fn test_hoon_code(input_str: &str, hoon_code: &str, expected: &str) -> Result<bool, TestError> {
+fn test_hoon_code(input_str: &str, hoon_code: &str, expected: &str) -> Result<(bool, String), TestError> {
     let combined_input = format!("%.  [{}]\n{}", input_str, hoon_code);
 
     let mut child = Command::new("urbit")
@@ -92,7 +98,7 @@ fn test_hoon_code(input_str: &str, hoon_code: &str, expected: &str) -> Result<bo
             if !output.status.success() {
                 let err = String::from_utf8_lossy(&output.stderr);
                 eprintln!("Error running `urbit eval`: {}", err);
-                return Ok(false);
+                return Ok((false, String::from_utf8_lossy(&output.stdout).to_string()));
             }
 
             let stdout = String::from_utf8_lossy(&output.stdout);
@@ -100,14 +106,15 @@ fn test_hoon_code(input_str: &str, hoon_code: &str, expected: &str) -> Result<bo
             let actual = re.replace_all(&stdout.trim(), "");
 
             if actual.starts_with("/eval") {
-                return Err(TestError::SyntaxError);
+                return Err(TestError::SyntaxError(actual.to_string()));
             }
-            if actual.contains("-find.") || actual.contains("nest-fail") || 
-               actual.contains("mint-vain") || actual.contains("mint-loss") {
-                return Err(TestError::CompileError);
+            for error in ["-find.", "nest-fail", "mint-vain", "mint-loss", "fire-type"] {
+                if actual.contains(error) {
+                    return Err(TestError::CompileError(actual.to_string()));
+                }
             }
 
-            Ok(actual == expected)
+            Ok((actual == expected, actual.to_string()))
         },
         Err(e) => {
             eprintln!("An error occurred: {}", e);
@@ -134,6 +141,7 @@ fn strip_code_fence(response: &str) -> String {
 struct TestResult {
     input: String,
     passed: bool,
+    output: String,
     error: Option<String>,
 }
 
@@ -143,10 +151,13 @@ struct TestResults {
     results: Vec<TestResult>,
 }
 
-async fn run_test_case(question_number: usize) -> Result<(), Box<dyn std::error::Error>> {
+async fn run_test_case(question_number: usize) -> Result<TestResults, Box<dyn std::error::Error>> {
     let test_file = read_test_file(&format!("./questions/{}.json", question_number))?;
     let system_prompt = std::fs::read_to_string("system-prompt.txt")?;
     
+    // print length of system prompt
+    println!("system prompt length: {}", system_prompt.len());
+
     println!("querying ai model for question {}", question_number);
     let response = query_ai_model(
         &system_prompt,
@@ -154,30 +165,34 @@ async fn run_test_case(question_number: usize) -> Result<(), Box<dyn std::error:
     ).await?;
     let hoon_code = strip_code_fence(&response);
 
+    println!("hoon code: {}", hoon_code);
+
     let test_results = TestResults {
         hoon_code: hoon_code.to_string(),
         results: test_file.tests
             .iter()
             .enumerate()
             .map(|(i, test)| {
-                println!("Running test for question {} - test index: {}", question_number, i);
                 match test_hoon_code(&test.input, &hoon_code, &test.expected) {
-                    Ok(passed) => TestResult {
+                    Ok((passed, actual)) => TestResult {
                         input: test.input.clone(),
                         passed,
+                        output: actual,
                         error: None,
                     },
-                    Err(TestError::CompileError) => {
+                    Err(TestError::CompileError(actual)) => {
                         TestResult {
                             input: test.input.clone(),
                             passed: false,
+                            output: actual,
                             error: Some("compile_error".to_string()),
                         }
                     },
-                    Err(TestError::SyntaxError) => {
+                    Err(TestError::SyntaxError(actual)) => {
                         TestResult {
                             input: test.input.clone(),
                             passed: false,
+                            output: actual,
                             error: Some("syntax_error".to_string()),
                         }
                     },
@@ -185,6 +200,7 @@ async fn run_test_case(question_number: usize) -> Result<(), Box<dyn std::error:
                         TestResult {
                             input: test.input.clone(),
                             passed: false,
+                            output: String::new(),
                             error: Some(format!("command_error: {}", e)),
                         }
                     },
@@ -192,7 +208,8 @@ async fn run_test_case(question_number: usize) -> Result<(), Box<dyn std::error:
                         TestResult {
                             input: test.input.clone(),
                             passed: false,
-                            error: Some(format!("unexpected_output: {}", output)),
+                            output,
+                            error: Some("unexpected_output".to_string()),
                         }
                     }
                 }
@@ -200,17 +217,18 @@ async fn run_test_case(question_number: usize) -> Result<(), Box<dyn std::error:
             .collect(),
     };
     
-    let json = serde_json::to_string_pretty(&test_results)?;
-    std::fs::write(&format!("results/{}.json", question_number), json)?;
-
-    Ok(())
+    Ok(test_results)
 }
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     dotenv().ok();
+    // Create results directory if it doesn't exist
+    std::fs::create_dir_all("./results")?;
+    
     // Get all question files from the questions directory
     let questions_dir = std::fs::read_dir("./questions")?;
+    let mut all_results: HashMap<String, TestResults> = HashMap::new();
     
     for entry in questions_dir {
         let entry = entry?;
@@ -226,40 +244,48 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             .and_then(|stem| stem.to_str())
             .and_then(|stem| stem.parse::<usize>().ok()) 
         {
-            if let Err(e) = run_test_case(question_number).await {
-                eprintln!("Error processing question {}: {}", question_number, e);
+            match run_test_case(question_number).await {
+                Ok(test_results) => {
+                    all_results.insert(question_number.to_string(), test_results);
+                },
+                Err(e) => {
+                    eprintln!("Error processing question {}: {}", question_number, e);
+                }
             }
         }
     }
-
     println!("\nTest Results Summary: \n");
-    let results_dir = std::fs::read_dir("./results")?;
+    // Create results diretory if it doesn't exist
+    // Get current date and time for filename
+    let now = chrono::Local::now();
+    let date_str = now.format("%Y-%m-%d_%H-%M-%S").to_string();
+    let results_path = format!("./results/{}.json", date_str);
     
-    for entry in results_dir {
-        let entry = entry?;
-        let path = entry.path();
+    // Write all results to the date-named JSON file
+    let json = serde_json::to_string_pretty(&all_results)?;
+    std::fs::write(&results_path, json)?;
+    // Print summary for each question
+    let mut sorted_numbers: Vec<_> = all_results.keys().collect();
+    sorted_numbers.sort_by(|a, b| {
+        a.parse::<i32>().unwrap_or(0).cmp(&b.parse::<i32>().unwrap_or(0))
+    });
+
+    for number in sorted_numbers {
+        let results = &all_results[number];
+        let total_tests = results.results.len();
+        let passed_tests = results.results.iter().filter(|r| r.passed).count();
+        println!("\nQuestion {} ({}/{} passed):", number, passed_tests, total_tests);
         
-        if path.extension().and_then(|ext| ext.to_str()) != Some("json") {
-            continue;
-        }
-        let contents = std::fs::read_to_string(&path)?;
-        let results: TestResults = serde_json::from_str(&contents)?;
-        if let Some(number) = path.file_stem().and_then(|s| s.to_str()) {
-            let total_tests = results.results.len();
-            let passed_tests = results.results.iter().filter(|r| r.passed).count();
-            println!("\nQuestion {} ({}/{} passed):", number, passed_tests, total_tests);
-            
-            for (i, test) in results.results.iter().enumerate() {
-                let status = if test.passed {
-                    "PASS".to_string()
-                } else {
-                    match &test.error {
-                        Some(err) => format!("FAIL - {}", err),
-                        None => "FAIL".to_string()
-                    }
-                };
-                println!("  Test {}: {}", i + 1, status);
-            }
+        for (i, test) in results.results.iter().enumerate() {
+            let status = if test.passed {
+                "PASS".to_string()
+            } else {
+                match &test.error {
+                    Some(err) => format!("FAIL - {}", err),
+                    None => "FAIL".to_string()
+                }
+            };
+            println!("  Test {}: {}", i + 1, status);
         }
     }
     Ok(())
