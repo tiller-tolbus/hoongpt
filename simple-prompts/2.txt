@@ -1,0 +1,6 @@
+Write a gate that takes a string (`tape`) containing multiple words separated by spaces and returns the longest word as a new string (`tape`). If there are multiple words with the same maximum length, return the first one encountered.
+
+Example inputs and outputs:
+Input: "hello world" : Output: "hello"
+Input: "find the longestword in this string" : Output: "longestword"
+Input: "a bb ccc ddd" : Output: "ccc"

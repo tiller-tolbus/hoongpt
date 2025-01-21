@@ -1,0 +1,6 @@
+Write a gate that takes a string (`tape`) and returns a loobean (`%.y` or `%.n`) indicating whether the string is a palindrome (reads the same forwards and backwards). Assume the string contains only lowercase letters and no spaces or punctuation.
+
+Example inputs and outputs:
+Input: "radar" : Output: %.y
+Input: "hoon" : Output: %.n
+Input: "level" : Output: %.y

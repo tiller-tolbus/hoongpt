@@ -1,0 +1,6 @@
+Write a gate that takes a string (`tape`) and returns a new string where each letter is shifted by 1 position in the alphabet (e.g., `a -> b`, `b -> c`, ..., `z -> a`). For simplicity, assume the string has only lowercase letters `a` to `z`.
+
+Example inputs and outputs:
+Input: "abz" : Output: "bca"
+Input: "hoon" : Output: "ippo"
+Input: "xyz" : Output: "yza"

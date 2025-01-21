@@ -1,0 +1,6 @@
+Write a gate that takes a natural number (type `@ud`) as input, calculates the sum of its decimal digits, and returns that sum as a natural number (type `@ud`).
+
+Example inputs and outputs:
+Input: 123 : Output: 6 (because 1 + 2 + 3 = 6)
+Input: 4096 : Output: 19 (4 + 0 + 9 + 6 = 19)
+Input: 0 : Output: 0

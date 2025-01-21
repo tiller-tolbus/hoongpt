@@ -1,0 +1,6 @@
+Write a gate that takes a cell containing a list of atoms (`(list @ud)`) and an integer `n` (`@ud`) and returns a new list where the elements are rotated to the left by `n` positions. If `n` is greater than the length of the list, rotate by `n modulo length`.
+
+Example inputs and outputs:
+Input: [~[1 2 3 4 5] 2] : Output: ~[3 4 5 1 2]
+Input: [~[10 20 30] 4] : Output: ~[20 30 10]
+Input: [~[7 8 9] 0] : Output: ~[7 8 9]

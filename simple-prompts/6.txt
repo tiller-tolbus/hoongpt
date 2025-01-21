@@ -1,0 +1,6 @@
+Create a gate that takes a signed decimal (`@sd`) representing a temperature in Celsius, converts it to Fahrenheit using the formula `F = (C × 9/5) + 32`, and returns the result as a signed decimal (`@sd`).
+
+Example inputs and outputs:
+Input: --0 : Output: --32
+Input: --100 : Output: --212
+Input: -40 : Output: -40

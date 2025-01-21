@@ -1,0 +1,6 @@
+Write a gate that takes a string (`tape`) and returns the total count of vowels (`a, e, i, o, u`) in that string as an atom (`@ud`). Assume only lowercase letters.
+
+Example inputs and outputs:
+Input: "hello" : Output: 2 (the vowels are `e` and `o`)
+Input: "sky" : Output: 0
+Input: "education" : Output: 5

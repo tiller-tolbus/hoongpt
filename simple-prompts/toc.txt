@@ -1,0 +1,10 @@
+1. validating an email address
+2. longest word in string
+3. list rotation
+4. is string a palindrome
+5. english text to morse code
+6. celsius to fahrenheit
+7. sum of digits
+8. check for prime
+9. count vowels in a string
+10. alphabetic shift

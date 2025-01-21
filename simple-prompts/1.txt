@@ -1,0 +1,7 @@
+Write a gate that takes a string (tape) representing an email address and returns a loobean (%.y or %.n) indicating whether the email address is valid. For simplicity, consider an email valid if it contains exactly one @ symbol, at least one . after the @, and no spaces.
+
+Example inputs and outputs:
+Input: "user@example.com" : Output: %.y
+Input: "userexample.com" : Output: %.n
+Input: "user@.com" : Output: %.n
+Input: "user@domain.c" : Output: %.y

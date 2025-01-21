@@ -1,0 +1,6 @@
+Write a gate that takes a string (`tape`) containing English letters (both lowercase and uppercase) and spaces, and returns a string (`tape`) representing the Morse code translation. Separate Morse code letters with spaces and words with a slash (`/`). Ignore any characters that are not letters or spaces.
+
+Example inputs and outputs:
+Input: "SOS" : Output: "... --- ..."
+Input: "Hello World" : Output: ".... . .-.. .-.. --- / .-- --- .-. .-.. -.."
+Input: "Hi!" : Output: ".... .."

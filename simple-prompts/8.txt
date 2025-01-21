@@ -1,0 +1,7 @@
+Write a gate that takes a natural number (type `@ud`) and returns a boolean (`%.y` or `%.n`) depending on whether the input is a prime number.
+
+Example inputs and outputs:
+Input: 5 : Output: %.y
+Input: 10 : Output: %.n
+Input: 13 : Output: %.y
+Input: 1 : Output: %.n
