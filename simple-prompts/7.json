@@ -1,0 +1,21 @@
+{
+    "question": "Write a gate that takes a natural number (type `@ud`) as input, calculates the sum of its decimal digits, and returns that sum as a natural number (type `@ud`).",
+    "tests": [
+        {
+            "input": "2468",
+            "expected": "20"
+        },
+        {
+            "input": "9999",
+            "expected": "36"
+        },
+        {
+            "input": "1000",
+            "expected": "1"
+        },
+        {
+            "input": "777",
+            "expected": "21"
+        }
+    ]
+}

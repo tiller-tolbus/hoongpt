@@ -1,0 +1,21 @@
+{
+    "question": "Write a gate that takes a string (`tape`) containing multiple words separated by spaces and returns the longest word as a new string (`tape`). If there are multiple words with the same maximum length, return the first one encountered.",
+    "tests": [
+        {
+            "input": "programming in hoon language",
+            "expected": "programming"
+        },
+        {
+            "input": "urbit mars earth moon",
+            "expected": "urbit"
+        },
+        {
+            "input": "short test case here",
+            "expected": "short"
+        },
+        {
+            "input": "antelope buffalo cheetah",
+            "expected": "antelope"
+        }
+    ]
+}

@@ -1,0 +1,21 @@
+{
+    "question": "Write a gate that takes a string (`tape`) containing English letters (both lowercase and uppercase) and spaces, and returns a string (`tape`) representing the Morse code translation. Separate Morse code letters with spaces and words with a slash (`/`). Ignore any characters that are not letters or spaces.",
+    "tests": [
+        {
+            "input": "URBIT NOW",
+            "expected": "..- .-. -... .. - / -. --- .--"
+        },
+        {
+            "input": "Mars Rocket",
+            "expected": "-- .- .-. ... / .-. --- -.-. -.- . -"
+        },
+        {
+            "input": "Keep Safe",
+            "expected": "-.- . . .--. / ... .- ..-. ."
+        },
+        {
+            "input": "OK",
+            "expected": "--- -.-"
+        }
+    ]
+}

@@ -1,0 +1,21 @@
+{
+    "question": "Create a gate that takes a signed decimal (`@sd`) representing a temperature in Celsius, converts it to Fahrenheit using the formula `F = (C × 9/5) + 32`, and returns the result as a signed decimal (`@sd`).",
+    "tests": [
+        {
+            "input": "--20",
+            "expected": "--68"
+        },
+        {
+            "input": "--37",
+            "expected": "--98"
+        },
+        {
+            "input": "-10",
+            "expected": "--14"
+        },
+        {
+            "input": "--50",
+            "expected": "--122"
+        }
+    ]
+}

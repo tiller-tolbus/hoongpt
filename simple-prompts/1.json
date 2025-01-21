@@ -1,0 +1,21 @@
+{
+    "question": "Write a gate that takes a string (tape) representing an email address and returns a loobean (%.y or %.n) indicating whether the email address is valid. For simplicity, consider an email valid if it contains exactly one @ symbol, at least one . after the @, and no spaces.",
+    "tests": [
+        {
+            "input": "john.doe@company.org",
+            "expected": "%.y"
+        },
+        {
+            "input": "invalid@@email.com",
+            "expected": "%.n"
+        },
+        {
+            "input": "no.at.symbol.com",
+            "expected": "%.n"
+        },
+        {
+            "input": "missing@dotcom",
+            "expected": "%.n"
+        }
+    ]
+}

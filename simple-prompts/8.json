@@ -1,0 +1,21 @@
+{
+    "question": "Write a gate that takes a natural number (type `@ud`) and returns a boolean (`%.y` or `%.n`) depending on whether the input is a prime number.",
+    "tests": [
+        {
+            "input": "17",
+            "expected": "%.y"
+        },
+        {
+            "input": "25",
+            "expected": "%.n"
+        },
+        {
+            "input": "97",
+            "expected": "%.y"
+        },
+        {
+            "input": "100",
+            "expected": "%.n"
+        }
+    ]
+}
