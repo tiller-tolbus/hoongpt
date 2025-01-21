@@ -1,3 +1,28 @@
 urbit
+results
 cses
 cses/*
+
+# Environment Variables
+.env
+.env.local
+.env.*.local
+
+# Keep example env file
+!.env.example
+
+# Rust specific ignores
+/target/
+**/*.rs.bk
+Cargo.lock
+*.pdb
+*.exe
+*.dll
+*.so
+*.dylib
+
+# IDE specific (optional)
+.idea/
+.vscode/
+*.swp
+*.swo
