@@ -6,6 +6,7 @@ use reqwest;
 use regex::Regex;
 use dotenv::dotenv;
 use std::collections::HashMap;
+use futures_util::stream::{FuturesUnordered, StreamExt};
 
 #[derive(Debug, Serialize, Deserialize)]
 struct TestCase {
@@ -230,6 +231,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let questions_dir = std::fs::read_dir("./questions")?;
     let mut all_results: HashMap<String, TestResults> = HashMap::new();
     
+    let mut futures = vec![];
+        
     for entry in questions_dir {
         let entry = entry?;
         let path = entry.path();
@@ -238,22 +241,33 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         if path.extension().and_then(|ext| ext.to_str()) != Some("json") {
             continue;
         }
-        
+
         // Extract question number from filename
         if let Some(question_number) = path.file_stem()
             .and_then(|stem| stem.to_str())
             .and_then(|stem| stem.parse::<usize>().ok()) 
         {
-            match run_test_case(question_number).await {
+            futures.push(async move { (run_test_case(question_number).await, question_number) });
+        }
+    }
+
+    let results = futures_util::stream::iter(futures)
+        .buffer_unordered(2)
+        .filter_map(|(result, question_number)| async move {
+            match result {
                 Ok(test_results) => {
-                    all_results.insert(question_number.to_string(), test_results);
+                    Some((question_number.to_string(), test_results))
                 },
                 Err(e) => {
                     eprintln!("Error processing question {}: {}", question_number, e);
+                    None
                 }
             }
-        }
-    }
+        })
+        .collect::<Vec<_>>()
+        .await;
+
+    all_results.extend(results);
     println!("\nTest Results Summary: \n");
     // Create results diretory if it doesn't exist
     // Get current date and time for filename
