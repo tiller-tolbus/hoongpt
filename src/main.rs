@@ -35,7 +35,7 @@ async fn query_ai_model(system_prompt: &str, user_prompt: &str) -> Result<String
     let client = reqwest::Client::new();
 
     let payload = serde_json::json!({
-        "model": "gpt-4o",
+        "model": "gpt-4-turbo",
         "messages": [
             {
                 "role": "system",
@@ -49,7 +49,6 @@ async fn query_ai_model(system_prompt: &str, user_prompt: &str) -> Result<String
     });
     let auth_token = std::env::var("OPENAI_API_KEY")
         .map_err(|_| "OPENAI_API_KEY environment variable not set")?;
-
     let response = client.post("https://api.openai.com/v1/chat/completions")
         .header("Authorization", format!("Bearer {}", auth_token))
         .header("Content-Type", "application/json")
@@ -57,9 +56,14 @@ async fn query_ai_model(system_prompt: &str, user_prompt: &str) -> Result<String
         .send()
         .await?;
 
+    if !response.status().is_success() {
+        let error_text = response.text().await?;
+        println!("error response: {}", error_text);
+        return Err(error_text.into());
+    }
+
     let result: serde_json::Value = response.json().await?;
 
-    
     Ok(result["choices"][0]["message"]["content"]
         .as_str()
         .unwrap_or("")
@@ -104,9 +108,10 @@ fn test_hoon_code(input_str: &str, hoon_code: &str, expected: &str) -> Result<(b
             if actual.starts_with("/eval") {
                 return Err(TestError::SyntaxError(actual.to_string()));
             }
-            if actual.contains("-find.") || actual.contains("nest-fail") || 
-               actual.contains("mint-vain") || actual.contains("mint-loss") {
-                return Err(TestError::CompileError(actual.to_string()));
+            for error in ["-find.", "nest-fail", "mint-vain", "mint-loss", "fire-type"] {
+                if actual.contains(error) {
+                    return Err(TestError::CompileError(actual.to_string()));
+                }
             }
 
             Ok((actual == expected, actual.to_string()))
@@ -150,12 +155,17 @@ async fn run_test_case(question_number: usize) -> Result<TestResults, Box<dyn st
     let test_file = read_test_file(&format!("./questions/{}.json", question_number))?;
     let system_prompt = std::fs::read_to_string("system-prompt.txt")?;
     
+    // print length of system prompt
+    println!("system prompt length: {}", system_prompt.len());
+
     println!("querying ai model for question {}", question_number);
     let response = query_ai_model(
         &system_prompt,
         &test_file.question
     ).await?;
     let hoon_code = strip_code_fence(&response);
+
+    println!("hoon code: {}", hoon_code);
 
     let test_results = TestResults {
         hoon_code: hoon_code.to_string(),
@@ -255,7 +265,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let json = serde_json::to_string_pretty(&all_results)?;
     std::fs::write(&results_path, json)?;
     // Print summary for each question
-    for (number, results) in all_results.iter() {
+    let mut sorted_numbers: Vec<_> = all_results.keys().collect();
+    sorted_numbers.sort_by(|a, b| {
+        a.parse::<i32>().unwrap_or(0).cmp(&b.parse::<i32>().unwrap_or(0))
+    });
+
+    for number in sorted_numbers {
+        let results = &all_results[number];
         let total_tests = results.results.len();
         let passed_tests = results.results.iter().filter(|r| r.passed).count();
         println!("\nQuestion {} ({}/{} passed):", number, passed_tests, total_tests);
@@ -272,6 +288,5 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             println!("  Test {}: {}", i + 1, status);
         }
     }
-    
     Ok(())
 }

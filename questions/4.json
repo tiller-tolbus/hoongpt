@@ -2,19 +2,19 @@
     "question": "Write a gate that takes a string (`tape`) and returns a loobean (`%.y` or `%.n`) indicating whether the string is a palindrome (reads the same forwards and backwards). Assume the string contains only lowercase letters and no spaces or punctuation.",
     "tests": [
         {
-            "input": "racecar",
+            "input": "\"racecar\"",
             "expected": "%.y"
         },
         {
-            "input": "urbit",
+            "input": "\"urbit\"",
             "expected": "%.n"
         },
         {
-            "input": "deified",
+            "input": "\"deified\"",
             "expected": "%.y"
         },
         {
-            "input": "noon",
+            "input": "\"noon\"",
             "expected": "%.y"
         }
     ]
