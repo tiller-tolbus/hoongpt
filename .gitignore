@@ -1,28 +1,28 @@
-urbit
-results
-cses
-cses/*
+# Python
+/venv/
+*.pyc
+__pycache__/
 
 # Environment Variables
 .env
 .env.local
 .env.*.local
-
-# Keep example env file
 !.env.example
 
-# Rust specific ignores
-/target/
-**/*.rs.bk
-Cargo.lock
-*.pdb
-*.exe
-*.dll
-*.so
-*.dylib
+# Project specific
+urbit
+results
+cses
+cses/*
+*.db
+*.db.bak
+hoongpt.db*
+extracted_text.txt
+2410.03981
 
-# IDE specific (optional)
+# IDE and System
 .idea/
 .vscode/
 *.swp
 *.swo
+.DS_Store
