@@ -1,0 +1,21 @@
+{
+    "question": "Write a gate that takes a `(list @)` and returns the first item. If the list is empty, return `~`. ex. (head ~[1 2 3]) -> 1.",
+    "tests": [
+        {
+            "input": "~[123]",
+            "expected": "123"
+        },
+        {
+            "input": "~[5 7 9]",
+            "expected": "5"
+        },
+        {
+            "input": "~",
+            "expected": "~"
+        },
+        {
+            "input": "~[0 9 8 5 3]",
+            "expected": "0"
+        }
+    ]
+}

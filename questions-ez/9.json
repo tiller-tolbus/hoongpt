@@ -1,0 +1,21 @@
+{
+    "question": "Write a gate that takes a @ud and returns whether it is even (`%.y`) or odd (`%.n`). ex. (is-even 4) -> %.y.",
+    "tests": [
+        {
+            "input": "2",
+            "expected": "%.y"
+        },
+        {
+            "input": "7",
+            "expected": "%.n"
+        },
+        {
+            "input": "0",
+            "expected": "%.y"
+        },
+        {
+            "input": "99",
+            "expected": "%.n"
+        }
+    ]
+}

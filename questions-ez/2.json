@@ -1,0 +1,21 @@
+{
+    "question": "Write a gate that takes a string (`tape`) and appends the letter `t` to the end of it. ex. (append-t \"ca\") -> \"cat\".",
+    "tests": [
+        {
+            "input": "\"bl\"",
+            "expected": "\"blt\""
+        },
+        {
+            "input": "\"hello worl\"",
+            "expected": "\"hello worlt\""
+        },
+        {
+            "input": "\"tes\"",
+            "expected": "\"test\""
+        },
+        {
+            "input": "\"\"",
+            "expected": "\"t\""
+        }
+    ]
+}

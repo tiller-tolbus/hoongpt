@@ -1,0 +1,21 @@
+{
+    "question": "Write a gate that takes a @ud and multiplies it by 2. ex (double 4) -> 8.",
+    "tests": [
+        {
+            "input": "1",
+            "expected": "2"
+        },
+        {
+            "input": "5",
+            "expected": "10"
+        },
+        {
+            "input": "100",
+            "expected": "200"
+        },
+        {
+            "input": "0",
+            "expected": "0"
+        }
+    ]
+}

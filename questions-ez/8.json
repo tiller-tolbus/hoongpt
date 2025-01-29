@@ -1,0 +1,21 @@
+{
+    "question": "Write a gate that takes a `tape` and reverses it. ex. (reverse \"abc\") -> \"cba\".",
+    "tests": [
+        {
+            "input": "\"hello\"",
+            "expected": "\"olleh\""
+        },
+        {
+            "input": "\"urbit\"",
+            "expected": "\"tibru\""
+        },
+        {
+            "input": "\"a\"",
+            "expected": "\"a\""
+        },
+        {
+            "input": "\"\"",
+            "expected": "\"\""
+        }
+    ]
+}

@@ -1,0 +1,21 @@
+{
+    "question": "Write a gate that takes a `tape` and returns its length. ex (strlen \"cat\") -> 3.",
+    "tests": [
+        {
+            "input": "\"hello\"",
+            "expected": "5"
+        },
+        {
+            "input": "\"urbit\"",
+            "expected": "5"
+        },
+        {
+            "input": "\"a\"",
+            "expected": "1"
+        },
+        {
+            "input": "\"\"",
+            "expected": "0"
+        }
+    ]
+}

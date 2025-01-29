@@ -1,0 +1,21 @@
+{
+    "question": "Write a gate that takes a `(list @)` and returns its length. ex. (list-len ~[1 2 3]) -> 3.",
+    "tests": [
+        {
+            "input": "~[1 2 3]",
+            "expected": "3"
+        },
+        {
+            "input": "~[5 9 15 20]",
+            "expected": "4"
+        },
+        {
+            "input": "~",
+            "expected": "0"
+        },
+        {
+            "input": "~[42]",
+            "expected": "1"
+        }
+    ]
+}

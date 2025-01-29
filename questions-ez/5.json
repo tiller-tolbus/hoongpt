@@ -1,0 +1,21 @@
+{
+    "question": "Write a gate that takes two @ud and returns their sum. ex (add 3 4) -> 7.",
+    "tests": [
+        {
+            "input": "[1 2]",
+            "expected": "3"
+        },
+        {
+            "input": "[10 15]",
+            "expected": "25"
+        },
+        {
+            "input": "[0 0]",
+            "expected": "0"
+        },
+        {
+            "input": "[99 1]",
+            "expected": "100"
+        }
+    ]
+}

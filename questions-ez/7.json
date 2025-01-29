@@ -1,0 +1,21 @@
+{
+    "question": "Write a gate that takes a `(list @)` and returns the last item. If the list is empty, return `~`. ex. (last ~[1 2 3]) -> 3.",
+    "tests": [
+        {
+            "input": "~[1 2 3]",
+            "expected": "3"
+        },
+        {
+            "input": "~[5 9 15]",
+            "expected": "15"
+        },
+        {
+            "input": "~",
+            "expected": "~"
+        },
+        {
+            "input": "~[42]",
+            "expected": "42"
+        }
+    ]
+}

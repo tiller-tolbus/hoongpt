@@ -1,0 +1,21 @@
+{
+    "question": "Write a gate that takes a @ud and adds the number 3. ex (add-3 3) -> 6.",
+    "tests": [
+        {
+            "input": "0",
+            "expected": "3"
+        },
+        {
+            "input": "9",
+            "expected": "12"
+        },
+        {
+            "input": "91",
+            "expected": "94"
+        },
+        {
+            "input": "15.503",
+            "expected": "15.506"
+        }
+    ]
+}
